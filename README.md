@@ -24,7 +24,7 @@ supplémentaire.
 ## Installation locale
 
 ```bash
-git clone <url-de-ton-repo>
+git clone https://github.com/Kamagatey/pdf-toolbox
 cd pdf-toolbox
 python -m venv .venv
 source .venv/bin/activate  # sous Windows : .venv\Scripts\activate
@@ -43,7 +43,7 @@ L'app s'ouvre sur http://localhost:8501
    git add .
    git commit -m "Initial commit"
    git branch -M main
-   git remote add origin https://github.com/<ton-user>/pdf-toolbox.git
+   git remote add origin https://github.com/Kamagatey/pdf-toolbox/pdf-toolbox.git
    git push -u origin main
    ```
 
@@ -56,17 +56,11 @@ L'app s'ouvre sur http://localhost:8501
 
 À chaque `git push` sur `main`, l'app se redéploie automatiquement.
 
-## Limites à connaître
+## Lien utilisable
 
-- La compression cible une réduction en jouant sur la qualité/résolution des
-  **images** contenues dans le PDF. Un PDF majoritairement composé de texte
-  (peu ou pas d'images) ne se réduira que légèrement, quel que soit le
-  réglage — c'est normal, il n'y a pas grand-chose à compresser.
-- `maxUploadSize` est fixé à 300 Mo dans `.streamlit/config.toml`
-  (ajustable).
-- Streamlit Community Cloud a des limites de ressources (RAM/CPU) sur le
-  plan gratuit : pour des PDF très volumineux (centaines de Mo), un usage en
-  local sera plus confortable.
+https://pdf-toolbox-yk.streamlit.app/
+
+
 
 ## Structure du projet
 
