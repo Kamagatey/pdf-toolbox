@@ -30,6 +30,16 @@ def pdf_page_count(pdf_bytes: bytes) -> int:
     return len(PdfReader(io.BytesIO(pdf_bytes)).pages)
 
 
+def safe_filename(name: str, default: str, ext: str) -> str:
+    """Nettoie un nom de fichier saisi par l'utilisateur et garantit la bonne extension."""
+    name = (name or default).strip().replace("/", "-").replace("\\", "-")
+    if not name:
+        name = default
+    if not name.lower().endswith(ext):
+        name += ext
+    return name
+
+
 # --------------------------------------------------------------------------- #
 # 1) Fusionner des PDF
 # --------------------------------------------------------------------------- #
@@ -154,11 +164,7 @@ def _fit_to_page(image: Image.Image, page_size_mm, dpi: int = 200) -> Image.Imag
     new_w = max(1, int(image.width * scale))
     new_h = max(1, int(image.height * scale))
 
-    if scale < 1.0:
-        resized = image.resize((new_w, new_h), Image.LANCZOS)
-    else:
-        resized = image  # taille d'origine conservée, pas d'étirement
-
+    resized = image.resize((new_w, new_h), Image.LANCZOS) if scale < 1.0 else image
     offset = ((page_w - new_w) // 2, (page_h - new_h) // 2)
     canvas.paste(resized, offset)
     return canvas
@@ -181,7 +187,7 @@ def images_to_pdf(
     pil_images = []
     for raw in images:
         im = Image.open(io.BytesIO(raw))
-        im = ImageOps.exif_transpose(im)
+        im = ImageOps.exif_transpose(im)  # corrige l'orientation selon l'EXIF (photos de téléphone)
         if im.mode != "RGB":
             im = im.convert("RGB")
         if scan_effect:
@@ -195,6 +201,7 @@ def images_to_pdf(
         out, format="PDF", save_all=True, append_images=pil_images[1:], quality=92
     )
     return out.getvalue()
+
 
 # --------------------------------------------------------------------------- #
 # 4) Diviser un PDF (une page par fichier, dans un zip)
