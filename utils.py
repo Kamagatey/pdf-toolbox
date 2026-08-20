@@ -148,16 +148,17 @@ def _fit_to_page(image: Image.Image, page_size_mm, dpi: int = 200) -> Image.Imag
     page_h = int(page_size_mm[1] / 25.4 * dpi)
     canvas = Image.new("RGB", (page_w, page_h), "white")
 
-    img_ratio = image.width / image.height
-    page_ratio = page_w / page_h
-    if img_ratio > page_ratio:
-        new_w = page_w
-        new_h = int(page_w / img_ratio)
-    else:
-        new_h = page_h
-        new_w = int(page_h * img_ratio)
+    # On ne rétrécit que si l'image est plus grande que la page.
+    # On ne l'agrandit jamais (ça la rendrait floue).
+    scale = min(page_w / image.width, page_h / image.height, 1.0)
+    new_w = max(1, int(image.width * scale))
+    new_h = max(1, int(image.height * scale))
 
-    resized = image.resize((new_w, new_h), Image.LANCZOS)
+    if scale < 1.0:
+        resized = image.resize((new_w, new_h), Image.LANCZOS)
+    else:
+        resized = image  # taille d'origine conservée, pas d'étirement
+
     offset = ((page_w - new_w) // 2, (page_h - new_h) // 2)
     canvas.paste(resized, offset)
     return canvas
@@ -189,7 +190,9 @@ def images_to_pdf(
         pil_images.append(im)
 
     out = io.BytesIO()
-    pil_images[0].save(out, format="PDF", save_all=True, append_images=pil_images[1:])
+    pil_images[0].save(
+        out, format="PDF", save_all=True, append_images=pil_images[1:], quality=92
+    )
     return out.getvalue()
 
 # --------------------------------------------------------------------------- #

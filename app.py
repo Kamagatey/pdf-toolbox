@@ -14,7 +14,7 @@ from utils import (
     rotate_pdf,
 )
 
-st.set_page_config(page_title="PDF Toolbox", page_icon="📄", layout="centered")
+st.set_page_config(page_title="PDF Toolbox", page_icon="📄", layout="wide")
 
 TOOLS = [
     "🔗 Fusionner des PDF",
