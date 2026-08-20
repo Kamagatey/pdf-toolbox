@@ -181,6 +181,7 @@ def images_to_pdf(
     pil_images = []
     for raw in images:
         im = Image.open(io.BytesIO(raw))
+        im = ImageOps.exif_transpose(im)
         if im.mode != "RGB":
             im = im.convert("RGB")
         if scan_effect:

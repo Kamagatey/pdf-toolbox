@@ -267,8 +267,29 @@ elif tool == TOOLS[5]:
 # --------------------------------------------------------------------------- #
 elif tool == TOOLS[6]:
     st.caption(
-        "Prends tes photos une par une avec l'appareil photo. "
+        "Prends tes photos une par une. "
         "Après chaque prise, l'appareil se réinitialise automatiquement pour la suivante."
+    )
+
+    st.markdown(
+        """
+        <style>
+        [data-testid="stCameraInput"] { width: 100% !important; }
+        [data-testid="stCameraInput"] video,
+        [data-testid="stCameraInput"] img {
+            width: 100% !important;
+            max-width: 100% !important;
+            height: auto !important;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    capture_mode = st.radio(
+        "Mode de capture",
+        ["📷 Caméra intégrée (aperçu direct)", "📱 Appareil photo natif (meilleure qualité)"],
+        horizontal=True,
     )
 
     if "scan_photos" not in st.session_state:
@@ -276,10 +297,17 @@ elif tool == TOOLS[6]:
     if "camera_key" not in st.session_state:
         st.session_state.camera_key = 0
 
-    photo = st.camera_input(
-        f"Photo n°{len(st.session_state.scan_photos) + 1}",
-        key=f"camera_{st.session_state.camera_key}",
-    )
+    if capture_mode.startswith("📷"):
+        photo = st.camera_input(
+            f"Photo n°{len(st.session_state.scan_photos) + 1}",
+            key=f"camera_{st.session_state.camera_key}",
+        )
+    else:
+        photo = st.file_uploader(
+            f"Photo n°{len(st.session_state.scan_photos) + 1}",
+            type=["jpg", "jpeg", "png"],
+            key=f"camera_{st.session_state.camera_key}",
+        )
 
     if photo is not None:
         st.session_state.scan_photos.append(photo.getvalue())
@@ -305,7 +333,7 @@ elif tool == TOOLS[6]:
 
         scan_effect = st.checkbox("Effet scanner (noir & blanc + contraste)", value=True)
         page_size = st.selectbox(
-            "Format de page", ["A4","Taille d'origine",  "Letter"], key="scan_page_size"
+            "Format de page", ["Taille d'origine", "A4", "Letter"], key="scan_page_size"
         )
 
         if st.button("📄 Générer le PDF", type="primary"):
