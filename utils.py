@@ -9,7 +9,7 @@ import zipfile
 from typing import List, Tuple
 
 from pypdf import PdfReader, PdfWriter
-from PIL import Image
+from PIL import Image, ImageOps
 
 
 # --------------------------------------------------------------------------- #
@@ -163,13 +163,27 @@ def _fit_to_page(image: Image.Image, page_size_mm, dpi: int = 200) -> Image.Imag
     return canvas
 
 
-def images_to_pdf(images: List[bytes], page_size: str = "Taille d'origine") -> bytes:
+def enhance_scan(image: Image.Image) -> Image.Image:
+    """Effet 'scanner' simple : niveaux de gris + contraste automatique
+    (façon CamScanner), sans dépendance externe."""
+    gray = ImageOps.grayscale(image)
+    gray = ImageOps.autocontrast(gray, cutoff=1)
+    return gray.convert("RGB")
+
+
+def images_to_pdf(
+    images: List[bytes],
+    page_size: str = "Taille d'origine",
+    scan_effect: bool = False,
+) -> bytes:
     """Convertit une liste d'images (bytes) en un PDF multi-pages."""
     pil_images = []
     for raw in images:
         im = Image.open(io.BytesIO(raw))
         if im.mode != "RGB":
             im = im.convert("RGB")
+        if scan_effect:
+            im = enhance_scan(im)
         if page_size != "Taille d'origine":
             im = _fit_to_page(im, PAGE_SIZES_MM[page_size])
         pil_images.append(im)

@@ -23,6 +23,7 @@ TOOLS = [
     "✂️ Diviser un PDF",
     "📑 Extraire / réorganiser des pages",
     "🔄 Pivoter des pages",
+    "📷 Scanner (photos → PDF)",   # ← nouveau, à la fin
 ]
 
 st.sidebar.title("📄 PDF Toolbox")
@@ -162,7 +163,7 @@ elif tool == TOOLS[2]:
             value=default_order,
         )
 
-        page_size = st.selectbox("Format de page", ["Taille d'origine", "A4", "Letter"])
+        page_size = st.selectbox("Format de page", [ "A4","Taille d'origine", "Letter"])
 
         if st.button("Convertir en PDF", type="primary"):
             try:
@@ -260,3 +261,64 @@ elif tool == TOOLS[5]:
                 )
             except (ValueError, AssertionError):
                 st.error(f"Indique des numéros de page valides entre 1 et {n_pages}.")
+
+# --------------------------------------------------------------------------- #
+# 7) Scanner : prendre des photos en direct -> PDF
+# --------------------------------------------------------------------------- #
+elif tool == TOOLS[6]:
+    st.caption(
+        "Prends tes photos une par une avec l'appareil photo. "
+        "Après chaque prise, l'appareil se réinitialise automatiquement pour la suivante."
+    )
+
+    if "scan_photos" not in st.session_state:
+        st.session_state.scan_photos = []
+    if "camera_key" not in st.session_state:
+        st.session_state.camera_key = 0
+
+    photo = st.camera_input(
+        f"Photo n°{len(st.session_state.scan_photos) + 1}",
+        key=f"camera_{st.session_state.camera_key}",
+    )
+
+    if photo is not None:
+        st.session_state.scan_photos.append(photo.getvalue())
+        st.session_state.camera_key += 1
+        st.rerun()
+
+    if st.session_state.scan_photos:
+        st.write(f"**{len(st.session_state.scan_photos)} photo(s) prise(s)**")
+        cols = st.columns(4)
+        for i, photo_bytes in enumerate(st.session_state.scan_photos):
+            with cols[i % 4]:
+                st.image(photo_bytes, caption=f"Page {i + 1}", use_container_width=True)
+
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("🗑️ Supprimer la dernière photo"):
+                st.session_state.scan_photos.pop()
+                st.rerun()
+        with col2:
+            if st.button("🗑️ Tout effacer"):
+                st.session_state.scan_photos = []
+                st.rerun()
+
+        scan_effect = st.checkbox("Effet scanner (noir & blanc + contraste)", value=True)
+        page_size = st.selectbox(
+            "Format de page", ["Taille d'origine", "A4", "Letter"], key="scan_page_size"
+        )
+
+        if st.button("📄 Générer le PDF", type="primary"):
+            result = images_to_pdf(
+                st.session_state.scan_photos, page_size=page_size, scan_effect=scan_effect
+            )
+            st.success(
+                f"PDF généré : {human_size(len(result))} "
+                f"({len(st.session_state.scan_photos)} page(s))"
+            )
+            st.download_button(
+                "⬇️ Télécharger le PDF",
+                data=result,
+                file_name="scan.pdf",
+                mime="application/pdf",
+            )
