@@ -400,7 +400,7 @@ elif tool == TOOL_NAMES[6]:
 
             scan_effect = st.checkbox("Effet scanner (noir & blanc + contraste)", value=False)
             page_size = st.selectbox(
-                "Format de page", ["Taille d'origine", "A4", "Letter"], key="scan_page_size"
+                "Format de page", [ "A4","Taille d'origine", "Letter"], key="scan_page_size"
             )
             file_name = st.text_input("Nom du fichier", value="scan")
 
@@ -415,6 +415,6 @@ elif tool == TOOL_NAMES[6]:
                 st.download_button(
                     "⬇️ Télécharger le PDF",
                     data=result,
-                    file_name=safe_filename(file_name, "scan", ".pdf"),
+                    file_name=safe_filename(file_name, "nom-du-fichier", ".pdf"),
                     mime="application/pdf",
                 )
