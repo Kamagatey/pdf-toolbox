@@ -192,7 +192,6 @@ def images_to_pdf(
     pil_images[0].save(out, format="PDF", save_all=True, append_images=pil_images[1:])
     return out.getvalue()
 
-
 # --------------------------------------------------------------------------- #
 # 4) Diviser un PDF (une page par fichier, dans un zip)
 # --------------------------------------------------------------------------- #
