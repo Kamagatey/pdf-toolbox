@@ -402,7 +402,7 @@ elif tool == TOOL_NAMES[6]:
             page_size = st.selectbox(
                 "Format de page", [ "A4","Taille d'origine", "Letter"], key="scan_page_size"
             )
-            file_name = st.text_input("Nom du fichier", value="scan")
+            file_name = st.text_input("Nom du fichier", value="Nom-du-fichier")
 
             if st.button("📄 Générer le PDF", type="primary"):
                 result = images_to_pdf(
@@ -415,6 +415,6 @@ elif tool == TOOL_NAMES[6]:
                 st.download_button(
                     "⬇️ Télécharger le PDF",
                     data=result,
-                    file_name=safe_filename(file_name, "nom-du-fichier", ".pdf"),
+                    file_name=safe_filename(file_name, "scan", ".pdf"),
                     mime="application/pdf",
                 )
