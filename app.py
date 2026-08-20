@@ -353,7 +353,7 @@ elif tool == TOOL_NAMES[6]:
 
     capture_mode = st.radio(
         "Mode de capture",
-        ["📷 Caméra intégrée (aperçu direct)", "📱 Appareil photo natif (meilleure qualité)"],
+        ["📱 Appareil photo natif (meilleure qualité)"],
         horizontal=True,
     )
 
