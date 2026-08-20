@@ -398,7 +398,7 @@ elif tool == TOOL_NAMES[6]:
                     st.session_state.scan_photos = []
                     st.rerun()
 
-            scan_effect = st.checkbox("Effet scanner (noir & blanc + contraste)", value=True)
+            scan_effect = st.checkbox("Effet scanner (noir & blanc + contraste)", value=False)
             page_size = st.selectbox(
                 "Format de page", ["Taille d'origine", "A4", "Letter"], key="scan_page_size"
             )
